@@ -33,7 +33,6 @@ app.post('/command', async (req, res) => {
 	  await client.say(channel, "[DEBUG] Bot a bien reçu la commande clear !");
 	  await client.say(channel, "/clear");
 	}
-    }
     else if (cmd === 'shoutout') {
       await client.say(channel, "/shoutout");
     }
