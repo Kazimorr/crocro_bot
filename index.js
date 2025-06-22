@@ -13,24 +13,29 @@ const client = new tmi.Client({
 
 client.connect();
 
-// Partie API Express
 const app = express();
 const PORT = process.env.PORT || 3000;
+const SECRET_API = process.env.API_SECRET; // NE PAS METTRE EN DUR !
 
 app.use(cors({
-  origin: '*' // tu peux restreindre à ton site plus tard !
+  origin: '*' // Ou restreins à 'https://kazimorr.com' plus tard
 }));
 app.use(express.json());
 
 app.post('/command', async (req, res) => {
-  const { cmd, question, prediction } = req.body;
+  const { cmd, question, prediction, secret } = req.body;
+  if (secret !== SECRET_API) {
+    return res.status(403).json({ ok: false, error: "Not allowed" });
+  }
   const channel = `#${process.env.CHANNEL}`;
   try {
-    if (cmd === 'clear_chat') {
-      await client.say(channel, "/clear");
+	if (cmd === "clear_chat") {
+	  await client.say(channel, "[DEBUG] Bot a bien reçu la commande clear !");
+	  await client.say(channel, "/clear");
+	}
     }
     else if (cmd === 'shoutout') {
-      await client.say(channel, "/shoutout"); // À remplacer par la commande shoutout si besoin
+      await client.say(channel, "/shoutout");
     }
     else if (cmd === 'poll' && question) {
       await client.say(channel, `!poll ${question}`);
@@ -55,7 +60,6 @@ app.listen(PORT, () => {
   console.log(`API crocro_bot en écoute sur le port ${PORT}`);
 });
 
-// Partie écoute tchat inchangée
 client.on('message', (channel, tags, message, self) => {
   if(self) return;
   if(message.toLowerCase() === '!ping') {
